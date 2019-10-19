@@ -8,14 +8,16 @@ const bodyParser = require('body-parser')
 
 const app = express()
 const port = 3000
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
 const messageLimit = (req, res, next) => {
   console.log('test messageLimit')
   next()
         //The HTTP 429 Too Many Requests response status code indicates the user has sent too many requests in a given amount of time ("rate limiting").
 }
 
+app
+  .use(bodyParser.json())
+
+// TEST //////////////////////////////////
 // const checkBody = (req, res) => {
 //   console.log("checking body");
 //   if (req.body === null || req.body === '') {
@@ -32,7 +34,7 @@ const messageLimit = (req, res, next) => {
 // };
 
 // app.use(checkBody)
-
+///////////////////////////////////////////////
 
 
 // Add a single endpoint to the app responds to POST requests to the /messages URI.
@@ -40,12 +42,13 @@ const messageLimit = (req, res, next) => {
 // Perform the following validation: if the body does NOT have a text property or the string is empty, then send a "Bad Request" HTTP status code to the client.
 // test with http -v POST http://localhost:3000/messages message=hi
 
-app.post('/messages', messageLimit, (req, res) => {
+
+  .post('/messages', messageLimit, (req, res) => {
   // To check isText seems to require a new library, which is not permitted for this assignment. Is assignment asking to check if null? https://www.npmjs.com/package/type-is#readme
   // if (req.body === null || req.body==='')
   // (!(req.body).isString || req.body === '') 
   console.log(req.body);
-  if (req.body === null || req.body === '') {
+  if (!(req.body).isText || req.body === '')  {
     res
       .status(400).json({
         message: 'Bad Request'
@@ -59,5 +62,5 @@ app.post('/messages', messageLimit, (req, res) => {
     console.log('checkBody passed')
   }
 })
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
