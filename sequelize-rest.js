@@ -55,11 +55,12 @@ router.post('/movies/add', (req, res, next) => {
 });
 // read all movies 
 router.get('/movies', (req, res, next) => {
-  Movie.findAll()
-    .then(movies => {
-      res.send(movies);
-    })
-    .catch(next);
+  const limit = req.query.limit || 25
+  const offset = req.query.offset || 0
+
+  Movie.findAndCountAll({ limit, offset })
+  .then(result => res.send({ movies: result.rows, total: result.count }))
+  .catch(error => next(error))
 });
 
 // read a single movie resource
