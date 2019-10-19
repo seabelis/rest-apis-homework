@@ -1,13 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json()
-
 const app = express();
 const port = 3000;
-app
-  .use(jsonParser)
-  // .use(bodyParser)
-  
 
 let request = 0;
 const messageLimit = (req, res, next) => {
@@ -24,6 +19,7 @@ const messageLimit = (req, res, next) => {
 
 app
   .use(messageLimit)
+  .use(jsonParser)
 
   // Add a single endpoint to the app responds to POST requests to the /messages URI.
   // When a request is sent to the endpoint, it should log the text property of the body to the console, and it should respond with a JSON object
@@ -34,7 +30,7 @@ app
     // To check isText seems to require a new library, which is not permitted for this assignment. Is assignment asking to check if null? https://www.npmjs.com/package/type-is#readme
     // if (req.body === null || req.body==='')
     // (!(req.body).isString || req.body === '')
-    console.log(req.body);
+    console.log(req.body.text);
     console.log(req.is('text/*'));  
     if (!req.body.text || req.body === "") {
       res.status(400).json({
