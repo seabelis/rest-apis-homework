@@ -1,8 +1,20 @@
+const express = require("express");
 const Sequelize = require('sequelize');
+const bodyParser = require("body-parser");
+const port = process.env.PORT || 4000;
+const app = express();
+
+
 
 //In the JavaScript file, initialize the database connection with Sequelize.
 const sequelize = new Sequelize('postgres://postgres:secret@localhost:5432/postgres');
 const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:secret@localhost:5432/postgres'
+
+const { Router } = require('express');
+const router = new Router();
+app.use(bodyParser.json())
+app.use(router)
+
 
 // Using Sequelize, define a model called Movie with the following properties (in addition to an ID):
 
@@ -13,24 +25,53 @@ const Movie = sequelize.define('movie', {
 })
 
 //Make sure the model is synched with the database upon startup.
-sequelize 
-// .sync()
-.sync({ force: true })
+sequelize.sync({force: true })
+    .then(() => console.log('Tables created successfully'))
+    .catch(err => {
+        console.error('Unable to create tables, shutting down...', err);
+        process.exit(1);
+    })
 
 //Use the model create() method to insert 3 rows of example data. This logic should happen after the model synchronization completes. The data should persist. Restarting the API should not cause any data to be lost.
 .then(() => {
-  console.log('Database schema has been updated.');
   const movies = [
   { title: 'Citizen Kane', yearOfRelease: 1941, synopsis: "Following the death of a publishing tycoon, news reporters scramble to discover the meaning of his final utterance."},
   {title: 'The Godfather', yearOfRelease: 1972, synopsis: "Francis Ford Coppola''s epic features Marlon Brando in his Oscar-winning role as the patriarch of the Corleone family. Director Coppola paints a chilling portrait of the Sicilian clan''s rise and near fall from power in America, masterfully balancing the story between the Corleone''s family life and the ugly crime business in which they are engaged. Based on Mario Puzo''s best-selling novel and featuring career-making performances by Al Pacino, James Caan and Robert Duvall, this searing and brilliant film garnered ten Academy Award nominations, and won three including Best Picture of 1972. [Paramount Pictures]"},
   {title: 'Rear Window', yearOfRelease: 1954, synopsis: "A wheelchair-bound photographer spies on his neighbours from his apartment window and becomes convinced one of them has committed murder."}
   ]
   const moviePromises = movies.map((movie) => Movie.create(movie))
-  return Promise.all(moviePromises)})
+  return Promise.all(moviePromises)
+})
+.catch(console.error);
 
 //Create an express app with routes that support the following RESTful actions on the "movies" resources.
 // create a new movie resource
-// read all movies (the collections resource)
+
+router.post('/movies/add', (req, res, next) => {
+  console.log ('what is req.body', req.body)
+  Movie.create(req.body) 
+  .then(movie => res.json(movie)) 
+  .catch(next)
+});
+// read all movies 
+router.get('/movies', (req, res, next) => {
+  Movie.findAll()
+    .then(movies => {
+      res.send(movies);
+    })
+    .catch(next);
+});
+
 // read a single movie resource
-// update a single movie resource
+router.get('/movie/:id', (req, res, next) => {
+  Movie.findByPk(req.params.id)
+  .then(params => {
+    res.send(params);
+  })
+  .catch(next);
+});
+
+
+  // update a single movie resource
 // delete a single movie resource
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
