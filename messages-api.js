@@ -1,7 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json()
+
 const app = express();
 const port = 3000;
+app
+  .use(jsonParser)
+  // .use(bodyParser)
+  
 
 let request = 0;
 const messageLimit = (req, res, next) => {
@@ -13,11 +19,10 @@ const messageLimit = (req, res, next) => {
     request++;
     next();
   }
-  // console.log("test messageLimit", request);
+  console.log("test messageLimit", request);
 };
 
 app
-  .use(bodyParser.json())
   .use(messageLimit)
 
   // Add a single endpoint to the app responds to POST requests to the /messages URI.
@@ -30,17 +35,19 @@ app
     // if (req.body === null || req.body==='')
     // (!(req.body).isString || req.body === '')
     console.log(req.body);
-    if (!req.body.isText || req.body === "") {
+    console.log(req.is('text/*'));  
+    if (!req.body.text || req.body === "") {
       res.status(400).json({
         message: "Bad Request"
       });
-      console.log("failed");
+      console.log("request failed");
       return;
     } else {
+      //Works if I disable the validation.
       res.json({
         message: "Message received loud and clear"
       });
-      console.log("passed");
+      console.log("request passed");
     }
   })
   .listen(port, () => console.log(`Example app listening on port ${port}!`));
