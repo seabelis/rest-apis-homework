@@ -9,9 +9,18 @@ const bodyParser = require('body-parser')
 const app = express()
 const port = 3000
 const messageLimit = (req, res, next) => {
-  console.log('test messageLimit')
-  next()
-        //The HTTP 429 Too Many Requests response status code indicates the user has sent too many requests in a given amount of time ("rate limiting").
+  //The HTTP 429 Too Many Requests response status code indicates the user has sent too many requests in a given amount of time ("rate limiting").
+  let request = 0
+  if (request > 5) {
+    res
+      .status(429).json({
+        message: 'Too Many Requests'
+      })
+    } else {
+      request ++
+      next()
+    }
+    console.log('test messageLimit', request)
 }
 
 app
