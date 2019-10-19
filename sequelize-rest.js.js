@@ -8,13 +8,10 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:secr
 // Using Sequelize, define a model called Movie with the following properties (in addition to an ID):
 
 const Movie = sequelize.define('movie', {
-  title: {
-    type: Sequelize.TEXT
-  },
-  yearOfRelease: {
-    type: Sequelize.NUMBER
-  },
-  synopsis: {
-    type: Sequelize.TEXT
-  }
+  title:  Sequelize.TEXT,
+  yearOfRelease: Sequelize.NUMBER,
+  synopsis: Sequelize.TEXT
 })
+
+//Make sure the model is synched with the database upon startup.
+sequelize.sync()
