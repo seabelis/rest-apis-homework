@@ -71,7 +71,21 @@ router.get('/movie/:id', (req, res, next) => {
   .catch(next);
 });
 
-
   // update a single movie resource
+  router.put("/movie/:id", (req, res, next) => {
+    console.log(req.params, 'update movie params')
+    Movie.findByPk(req.params.id)
+      .then(movie => {
+        console.log("MOVIE FOUND?", movie)
+        if (movie) {
+          movie
+            .update(req.body)
+            .then(movie => res.json(movie));
+        } else {
+          res.status(404).end();
+        }
+      })
+      .catch(next);
+  });
 // delete a single movie resource
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
