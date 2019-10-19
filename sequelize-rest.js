@@ -73,10 +73,10 @@ router.get('/movie/:id', (req, res, next) => {
 
   // update a single movie resource
   router.put("/movie/:id", (req, res, next) => {
-    console.log(req.params, 'update movie params')
+    // console.log(req.params, 'update movie params')
     Movie.findByPk(req.params.id)
       .then(movie => {
-        console.log("MOVIE FOUND?", movie)
+        // console.log("MOVIE FOUND?", movie)
         if (movie) {
           movie
             .update(req.body)
@@ -87,5 +87,24 @@ router.get('/movie/:id', (req, res, next) => {
       })
       .catch(next);
   });
+
 // delete a single movie resource
+router.delete("/movie/delete/:id", (req, res, next) => {
+  console.log('WHAT IS REQ.PARAMS before we get wrecked by params', req.params)
+  res.send('Some people want to watch the world burn') // -> route works
+  Movie.delete({
+    where: {
+      id: req.params.id,
+    }
+  })
+  .then(numDeleted => {
+    if (numDeleted) {
+      res.status(204).end();
+    } else {
+      res.status(404).end();
+    }
+  })
+  .catch(next);
+});
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
