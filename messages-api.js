@@ -8,9 +8,10 @@ const bodyParser = require('body-parser')
 
 const app = express()
 const port = 3000
+
+let request = 0
 const messageLimit = (req, res, next) => {
   //The HTTP 429 Too Many Requests response status code indicates the user has sent too many requests in a given amount of time ("rate limiting").
-  let request = 0
   if (request > 5) {
     res
       .status(429).json({
@@ -25,6 +26,7 @@ const messageLimit = (req, res, next) => {
 
 app
   .use(bodyParser.json())
+  .use(messageLimit)
 
 // TEST //////////////////////////////////
 // const checkBody = (req, res) => {
@@ -52,7 +54,7 @@ app
 // test with http -v POST http://localhost:3000/messages message=hi
 
 
-  .post('/messages', messageLimit, (req, res) => {
+  .post('/messages', (req, res) => {
   // To check isText seems to require a new library, which is not permitted for this assignment. Is assignment asking to check if null? https://www.npmjs.com/package/type-is#readme
   // if (req.body === null || req.body==='')
   // (!(req.body).isString || req.body === '') 
